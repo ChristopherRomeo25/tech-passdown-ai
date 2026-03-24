@@ -195,23 +195,78 @@ Sebas follow up on failed test"></textarea>
     }
 
     function formatPassdown() {
-      const dateValue = document.getElementById("date").value;
-      const shift = document.getElementById("shift").value;
-      const notes = document.getElementById("notes").value.trim();
+  const dateValue = document.getElementById("date").value;
+  const shift = document.getElementById("shift").value;
+  const notes = document.getElementById("notes").value.trim();
 
-      const displayDate = formatDisplayDate(dateValue);
+  const displayDate = formatDisplayDate(dateValue);
 
-      let bulletLines = "";
-      if (notes.length > 0) {
-        const lines = notes
-          .split("\n")
-          .map(line => line.trim())
-          .filter(line => line !== "");
+  const onTheFloor = [];
+  const safetyQuality = [];
+  const actionItems = [];
 
-        bulletLines = lines.map(line => `• ${line}`).join("\n");
+  if (notes.length > 0) {
+    const lines = notes
+      .split("\n")
+      .map(line => line.trim())
+      .filter(line => line !== "");
+
+    lines.forEach(line => {
+      const lowerLine = line.toLowerCase();
+
+      const isSafetyQuality =
+        lowerLine.includes("quality") ||
+        lowerLine.includes("safety") ||
+        lowerLine.includes("issue") ||
+        lowerLine.includes("fail") ||
+        lowerLine.includes("failed") ||
+        lowerLine.includes("recheck") ||
+        lowerLine.includes("hold") ||
+        lowerLine.includes("problem") ||
+        lowerLine.includes("error");
+
+      const isActionItem =
+        lowerLine.includes("follow up") ||
+        lowerLine.includes("follow-up") ||
+        lowerLine.includes("check tomorrow") ||
+        lowerLine.includes("tomorrow") ||
+        lowerLine.includes("needs") ||
+        lowerLine.includes("need to") ||
+        lowerLine.includes("review") ||
+        lowerLine.includes("verify") ||
+        lowerLine.includes("retest") ||
+        lowerLine.includes("inspect") ||
+        lowerLine.includes("sebas") ||
+        lowerLine.includes("kalani");
+
+      if (isSafetyQuality) {
+        safetyQuality.push(`• ${line}`);
+      } else if (isActionItem) {
+        actionItems.push(`• ${line}`);
       } else {
-        bulletLines = "• No updates entered.";
+        onTheFloor.push(`• ${line}`);
       }
+    });
+  }
+
+  const onTheFloorText = onTheFloor.length > 0 ? onTheFloor.join("\n") : "• No updates entered.";
+  const safetyQualityText = safetyQuality.length > 0 ? safetyQuality.join("\n") : "• None.";
+  const actionItemsText = actionItems.length > 0 ? actionItems.join("\n") : "• None.";
+
+  const passdownText =
+`Tech Pass Down – ${displayDate} ${shift}
+
+On The Floor
+${onTheFloorText}
+
+Safety / Quality
+${safetyQualityText}
+
+Action Items
+${actionItemsText}`;
+
+  document.getElementById("preview").textContent = passdownText;
+}
 
       const passdownText =
 `Tech Pass Down – ${displayDate} ${shift}
