@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Pass Down AI</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 32px;
+    }
+
+    p.subtitle {
+      margin-top: 0;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #1e293b;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      margin-bottom: 20px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #cbd5e1;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #22c55e;
+      color: white;
+    }
+
+    .secondary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .ghost {
+      background: #475569;
+      color: white;
+    }
+
+    .preview {
+      white-space: pre-wrap;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 16px;
+      min-height: 250px;
+      line-height: 1.6;
+    }
+
+    .small-note {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 800px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tech Pass Down AI</h1>
+    <p class="subtitle">Simple pass-down formatter for technicians</p>
+
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label for="date">Date</label>
+          <input type="date" id="date" />
+        </div>
+
+        <div class="field">
+          <label for="shift">Shift</label>
+          <select id="shift">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+            <option value="NOC">NOC</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="notes">Raw Notes</label>
+        <textarea id="notes" placeholder="Example:
+N9917B 106 running
+N9918B 105 in chamber
+Quality issue on unit 53 needs recheck tomorrow
+Sebas follow up on failed test"></textarea>
+      </div>
+
+      <div class="button-row">
+        <button class="primary" onclick="formatPassdown()">Format Passdown</button>
+        <button class="secondary" onclick="openEmailDraft()">Open Email Draft</button>
+        <button class="ghost" onclick="clearAllFields()">Clear</button>
+      </div>
+
+      <div class="small-note">
+        For now, each new line becomes one bullet under "On The Floor."
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Preview</label>
+      <div id="preview" class="preview">Your formatted pass-down will appear here.</div>
+    </div>
+  </div>
+
+  <script>
+    const recipientList = "your@email.com"; // Change this later
+
+    window.onload = () => {
+      const today = new Date();
+      document.getElementById("date").value = today.toISOString().split("T")[0];
+    };
+
+    function formatDisplayDate(dateValue) {
+      if (!dateValue) return "No Date";
+      const date = new Date(dateValue + "T00:00:00");
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+    }
+
+    function formatPassdown() {
+      const dateValue = document.getElementById("date").value;
+      const shift = document.getElementById("shift").value;
+      const notes = document.getElementById("notes").value.trim();
+
+      const displayDate = formatDisplayDate(dateValue);
+
+      let bulletLines = "";
+      if (notes.length > 0) {
+        const lines = notes
+          .split("\n")
+          .map(line => line.trim())
+          .filter(line => line !== "");
+
+        bulletLines = lines.map(line => `• ${line}`).join("\n");
+      } else {
+        bulletLines = "• No updates entered.";
+      }
+
+      const passdownText =
+`Tech Pass Down – ${displayDate} ${shift}
+
+On The Floor
+${bulletLines}
+
+Safety / Quality
+• 
+
+Action Items
+• `;
+
+      document.getElementById("preview").textContent = passdownText;
+    }
+
+    function openEmailDraft() {
+      const previewText = document.getElementById("preview").textContent.trim();
+
+      if (
+        !previewText ||
+        previewText === "Your formatted pass-down will appear here."
+      ) {
+        alert("Please click 'Format Passdown' first.");
+        return;
+      }
+
+      const dateValue = document.getElementById("date").value;
+      const shift = document.getElementById("shift").value;
+      const displayDate = formatDisplayDate(dateValue);
+
+      const subject = `Tech Pass Down – ${displayDate} ${shift}`;
+
+      const mailtoLink =
+        `mailto:${encodeURIComponent(recipientList)}` +
+        `?subject=${encodeURIComponent(subject)}` +
+        `&body=${encodeURIComponent(previewText)}`;
+
+      window.location.href = mailtoLink;
+    }
+
+    function clearAllFields() {
+      document.getElementById("notes").value = "";
+      document.getElementById("preview").textContent = "Your formatted pass-down will appear here.";
+    }
+  </script>
+</body>
+</html>
