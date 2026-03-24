@@ -194,7 +194,7 @@ Sebas follow up on failed test"></textarea>
       });
     }
 
-    function formatPassdown() {
+   function formatPassdown() {
   const dateValue = document.getElementById("date").value;
   const shift = document.getElementById("shift").value;
   const notes = document.getElementById("notes").value.trim();
@@ -248,6 +248,25 @@ Sebas follow up on failed test"></textarea>
       }
     });
   }
+
+  const onTheFloorText = onTheFloor.length > 0 ? onTheFloor.join("\n") : "• No updates entered.";
+  const safetyQualityText = safetyQuality.length > 0 ? safetyQuality.join("\n") : "• None.";
+  const actionItemsText = actionItems.length > 0 ? actionItems.join("\n") : "• None.";
+
+  const passdownText =
+`Tech Pass Down – ${displayDate} ${shift}
+
+On The Floor
+${onTheFloorText}
+
+Safety / Quality
+${safetyQualityText}
+
+Action Items
+${actionItemsText}`;
+
+  document.getElementById("preview").textContent = passdownText;
+}
 
   const onTheFloorText = onTheFloor.length > 0 ? onTheFloor.join("\n") : "• No updates entered.";
   const safetyQualityText = safetyQuality.length > 0 ? safetyQuality.join("\n") : "• None.";
