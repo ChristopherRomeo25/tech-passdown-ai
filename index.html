@@ -783,7 +783,7 @@
       <div class="setup-step">
         <div class="step-num">4</div>
         <div class="step-content">
-          Click <strong>Generate token</strong>, <strong>copy</strong> it, and paste it below. <strong>Never share your token with anyone</strong> — not in Copilot, chat or email.
+          Click <strong>Generate token</strong>, <strong>copy</strong> it, and paste it below. <strong>Never share your token with anyone</strong> — not in chat, email, or Slack.
         </div>
       </div>
 
@@ -1201,7 +1201,7 @@
     let msg = 'Template saved!';
     if (sections > 0) msg += ` ${sections} custom section${sections !== 1 ? 's' : ''} set.`;
     if (hasExamples) msg += ' Example pass-down(s) loaded.';
-    if (sections === 0 && !hasExamples) msg = 'Template cleared — using default calibration lab format.';
+    if (sections === 0 && !hasExamples) msg = 'Template cleared — using default FieldFox format.';
 
     templateNote.textContent = msg;
     templateNote.className = 'setup-note success';
@@ -1217,7 +1217,7 @@
       customSections: '',
       examplePassdowns: '',
     });
-    templateNote.textContent = 'Template cleared. AI will use the default calibration lab format.';
+    templateNote.textContent = 'Template cleared. AI will use the default FieldFox format.';
     templateNote.className = 'setup-note info';
   });
 
@@ -1530,6 +1530,72 @@ Rules:
     }
   });
 
+  // ══════════════════════════════════════
+  //  REAL-TIME SPEECH CORRECTIONS
+  //  Fixes common misrecognitions from
+  //  Google Speech API for lab vocabulary
+  // ══════════════════════════════════════
+
+  const speechCorrections = [
+    // ── FieldFox model numbers ──
+    [/\bfield\s*fox\b/gi, 'FieldFox'],
+    [/\bfeel\s*fox\b/gi, 'FieldFox'],
+    [/\bphil\s*fox\b/gi, 'FieldFox'],
+    [/\bfield\s*fax\b/gi, 'FieldFox'],
+    [/\bfield\s*walks\b/gi, 'FieldFox'],
+
+    // ── Keysight model families (N99xxA/B) ──
+    [/\bn\s*99\s*(\d{2})\s*([ab])\b/gi, (_, num, letter) => `N99${num}${letter.toUpperCase()}`],
+    [/\bn\s*9\s*9\s*(\d)\s*(\d)\s*([ab])\b/gi, (_, d1, d2, letter) => `N99${d1}${d2}${letter.toUpperCase()}`],
+
+    // ── P-series (P18D etc) ──
+    [/\bp\s*18\s*d\b/gi, 'P18D'],
+    [/\bP\s*18\s*D\b/g, 'P18D'],
+
+    // ── Common acronyms Google mangles ──
+    [/\bE\.?\s*S\.?\s*D\.?\b/gi, 'ESD'],
+    [/\be\s*s\s*d\b/gi, 'ESD'],
+    [/\bP\.?\s*P\.?\s*E\.?\b/g, 'PPE'],
+    [/\bR\.?\s*M\.?\s*A\.?\b/g, 'RMA'],
+    [/\bN\.?\s*P\.?\s*I\.?\b/g, 'NPI'],
+    [/\bR\.?\s*F\.?\b/g, 'RF'],
+    [/\bP\.?\s*C\.?\s*B\.?\b/g, 'PCB'],
+    [/\bD\.?\s*U\.?\s*T\.?\b/g, 'DUT'],
+    [/\bS\.?\s*M\.?\s*A\.?\b/g, 'SMA'],
+    [/\bB\.?\s*N\.?\s*C\.?\b/g, 'BNC'],
+    [/\bS\.?\s*C\.?\s*P\.?\s*I\.?\b/gi, 'SCPI'],
+    [/\bskippy\b/gi, 'SCPI'],
+    [/\bscippy\b/gi, 'SCPI'],
+    [/\bW\.?\s*O\.?\s*(\d)/gi, (_, d) => `WO ${d}`],
+
+    // ── Keysight ──
+    [/\bkey\s*site\b/gi, 'Keysight'],
+    [/\bkey\s*sight\b/gi, 'Keysight'],
+    [/\bkey\s*cite\b/gi, 'Keysight'],
+
+    // ── Cal lab terms ──
+    [/\bcal\s*lab\b/gi, 'cal lab'],
+    [/\bspec\s*an\b/gi, 'spec an'],
+    [/\bspectrum\s*analyzer\b/gi, 'spectrum analyzer'],
+    [/\bsignal\s*gen\b/gi, 'signal gen'],
+    [/\bnetwork\s*analyzer\b/gi, 'network analyzer'],
+    [/\bvisa\b/g, 'VISA'],  // only exact lowercase
+
+    // ── Common bench talk ──
+    [/\bbench\s*(\d+)/gi, (_, n) => `bench ${n}`],
+    [/\bserial\s*number\b/gi, 'serial number'],
+    [/\bwork\s*order\b/gi, 'work order'],
+    [/\block\s*out\s*tag\s*out\b/gi, 'lockout tagout'],
+  ];
+
+  function correctSpeech(text) {
+    let corrected = text;
+    for (const [pattern, replacement] of speechCorrections) {
+      corrected = corrected.replace(pattern, replacement);
+    }
+    return corrected;
+  }
+
   // ── Web Speech API ──
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1542,10 +1608,14 @@ Rules:
     recognition.onresult = (e) => {
       let interim = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + '\n';
-        else interim += e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          finalTranscript += correctSpeech(e.results[i][0].transcript) + '\n';
+        } else {
+          interim += e.results[i][0].transcript;
+        }
       }
-      rawNotes.value = finalTranscript + interim;
+      // Show corrected finals + raw interim (interim gets corrected when finalized)
+      rawNotes.value = finalTranscript + correctSpeech(interim);
     };
 
     recognition.onerror = (e) => { stopRecording(); showStatus('Mic error: ' + e.error, 'error'); };
