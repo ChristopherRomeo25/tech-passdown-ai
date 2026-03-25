@@ -97,18 +97,191 @@
     margin-top: 2px;
   }
 
-  /* ── Config Bar ── */
+  /* ══════════════════════════════════════
+     SETUP OVERLAY
+  ══════════════════════════════════════ */
+  .setup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(5, 8, 15, 0.92);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .setup-overlay.hidden { display: none; }
+
+  .setup-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    max-width: 540px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .setup-card h2 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .setup-card .setup-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .setup-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    border: 1px solid rgba(233,122,31,0.25);
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .step-content strong { color: var(--text-primary); }
+
+  .step-content a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .step-content a:hover { text-decoration: underline; }
+
+  .step-content code {
+    background: rgba(233,122,31,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .setup-form {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .setup-form label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .setup-form input {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .setup-form input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .setup-form input[type="password"] {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  .setup-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .setup-note {
+    margin-top: 20px;
+    padding: 10px 14px;
+    background: rgba(34, 197, 94, 0.06);
+    border: 1px solid rgba(34, 197, 94, 0.12);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: none;
+  }
+
+  .setup-note.success {
+    display: block;
+    color: var(--success);
+    background: var(--success-bg);
+    border-color: rgba(34, 197, 94, 0.2);
+  }
+
+  .setup-note.error {
+    display: block;
+    color: var(--danger);
+    background: var(--danger-bg);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .setup-note.info {
+    display: block;
+    color: var(--accent);
+    background: var(--accent-glow);
+    border-color: rgba(233, 122, 31, 0.2);
+  }
+
+  /* ══════════════════════════════════════
+     MAIN APP STYLES
+  ══════════════════════════════════════ */
+
   .config-bar {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: auto 1fr 1fr 1fr;
     gap: 12px;
     margin-bottom: 20px;
   }
 
   @media (max-width: 700px) {
-    .config-bar { grid-template-columns: 1fr; }
+    .config-bar { grid-template-columns: 1fr 1fr; }
     .panels { grid-template-columns: 1fr !important; }
-    .token-bar { grid-template-columns: 1fr !important; }
+    .model-bar { grid-template-columns: 1fr !important; }
   }
 
   .config-field label {
@@ -147,79 +320,64 @@
     color: var(--text-primary);
   }
 
-  /* ── Token Bar ── */
-  .token-bar {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 12px;
-    align-items: end;
-    margin-bottom: 20px;
-  }
-
-  .token-bar input {
-    font-family: var(--font-display);
-    font-size: 13px;
-    letter-spacing: 0.5px;
-  }
-
-  .token-status {
+  /* ── User badge ── */
+  .user-badge {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding-bottom: 2px;
-    margin-bottom: 0;
-    height: 42px;
-  }
-
-  .status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--text-muted);
-    flex-shrink: 0;
-    transition: background 0.3s, box-shadow 0.3s;
-  }
-
-  .status-dot.active {
-    background: var(--success);
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
-  }
-
-  .status-text {
-    font-family: var(--font-display);
-    font-size: 10px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-
-  .status-text.active { color: var(--success); }
-
-  .token-help {
-    margin-bottom: 20px;
-    padding: 10px 14px;
-    background: rgba(233, 122, 31, 0.05);
-    border: 1px solid rgba(233, 122, 31, 0.12);
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    display: none;
+    margin-bottom: 20px;
   }
 
-  .token-help a {
-    color: var(--accent);
-    text-decoration: none;
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #c45e0a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
   }
 
-  .token-help a:hover { text-decoration: underline; }
+  .user-info {
+    flex: 1;
+  }
 
-  .token-help-toggle {
+  .user-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .user-status {
+    font-size: 11px;
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .user-status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px rgba(34,197,94,0.4);
+  }
+
+  .user-settings-btn {
     background: none;
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 6px 12px;
+    padding: 6px 10px;
     color: var(--text-muted);
     cursor: pointer;
     font-family: var(--font-display);
@@ -227,58 +385,19 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: all 0.2s;
-    white-space: nowrap;
   }
 
-  .token-help-toggle:hover {
+  .user-settings-btn:hover {
     border-color: var(--text-secondary);
     color: var(--text-secondary);
   }
 
-  /* ── Model Selector ── */
+  /* ── Model + Recipients row ── */
   .model-bar {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  @media (max-width: 700px) {
-    .model-bar { grid-template-columns: 1fr; }
-  }
-
-  /* ── Recipients ── */
-  .recipients-bar {
     margin-bottom: 24px;
-  }
-
-  .recipients-bar label {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
-
-  .recipients-bar input {
-    width: 100%;
-    padding: 10px 12px;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    font-size: 14px;
-    transition: border-color 0.2s;
-  }
-
-  .recipients-bar input:focus {
-    outline: none;
-    border-color: var(--border-focus);
-    box-shadow: 0 0 0 3px var(--accent-glow);
   }
 
   /* ── Panels ── */
@@ -379,51 +498,12 @@
   }
 
   @keyframes pulse-mic {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
-    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
   }
-
-  /* ── Section hint tags ── */
-  .section-hint {
-    padding: 6px 16px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    align-items: center;
-  }
-
-  .section-hint .hint-label {
-    font-family: var(--font-display);
-    font-size: 10px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-right: 4px;
-  }
-
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: var(--font-display);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-  }
-
-  .tag.ai { background: rgba(233,122,31,0.08); color: var(--accent); border: 1px solid rgba(233,122,31,0.15); }
-  .tag.floor { background: rgba(59,130,246,0.08); color: #60a5fa; border: 1px solid rgba(59,130,246,0.15); }
-  .tag.cal { background: rgba(168,85,247,0.08); color: #c084fc; border: 1px solid rgba(168,85,247,0.15); }
-  .tag.safety { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.15); }
-  .tag.action { background: rgba(234,179,8,0.08); color: #facc15; border: 1px solid rgba(234,179,8,0.15); }
-  .tag.info { background: rgba(34,197,94,0.08); color: #4ade80; border: 1px solid rgba(34,197,94,0.15); }
 
   /* ── Buttons ── */
-  .actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
   .btn {
     padding: 12px 24px;
@@ -500,7 +580,6 @@
   .status-msg.success { display: block; background: var(--success-bg); border: 1px solid rgba(34,197,94,0.25); color: var(--success); }
   .status-msg.error { display: block; background: var(--danger-bg); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); }
 
-  /* ── Spinner ── */
   .spinner {
     display: inline-block;
     width: 14px;
@@ -513,12 +592,10 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Scrollbar ── */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-  /* ── Footer ── */
   .app-footer {
     margin-top: 40px;
     padding-top: 16px;
@@ -533,9 +610,67 @@
 </head>
 <body>
 
+<!-- ══════════════════════════════════════
+     SETUP OVERLAY — First-time onboarding
+══════════════════════════════════════ -->
+<div class="setup-overlay" id="setupOverlay">
+  <div class="setup-card">
+    <h2>👋 Welcome to Tech Pass Down</h2>
+    <p class="setup-subtitle">One-time setup — takes about 2 minutes. Your info stays in this browser only.</p>
+
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        Go to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">GitHub → New Token</a> (create a free GitHub account first if you don't have one)
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        Set <strong>Token name</strong> to anything (e.g. <code>Pass Down Tool</code>), set <strong>Expiration</strong> to <strong>90 days</strong> or whatever you prefer
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        Under <strong>Permissions → Account permissions</strong>, find <strong>Models</strong> and set it to <strong>Read-only</strong> — this is the only permission needed
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        Click <strong>Generate token</strong>, <strong>copy</strong> it, and paste it below. <strong>Never share your token with anyone</strong> — not in chat, email, or Slack.
+      </div>
+    </div>
+
+    <div class="setup-form">
+      <label>Your Name</label>
+      <input type="text" id="setupName" placeholder="e.g. Chris Martinez">
+
+      <label>GitHub Token</label>
+      <input type="password" id="setupToken" placeholder="ghp_... or github_pat_...">
+
+      <label>Email Recipients (optional — can set later)</label>
+      <input type="text" id="setupRecipients" placeholder="team@keysight.com, lead@keysight.com">
+
+      <div class="setup-note" id="setupNote"></div>
+
+      <div class="setup-actions">
+        <button class="btn btn-primary" id="setupTestBtn">🔍 Test Token</button>
+        <button class="btn btn-send" id="setupDoneBtn" disabled>✓ Save & Start</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
 <div class="app-wrapper">
 
-  <!-- Header -->
   <header class="app-header">
     <div class="logo-mark">PD</div>
     <div class="header-text">
@@ -544,8 +679,22 @@
     </div>
   </header>
 
-  <!-- Config: Date / Shift / Subject -->
+  <!-- User badge -->
+  <div class="user-badge" id="userBadge">
+    <div class="user-avatar" id="userAvatar">?</div>
+    <div class="user-info">
+      <div class="user-name" id="userName">Not signed in</div>
+      <div class="user-status"><span class="dot"></span> <span id="userStatusLabel">Connected</span></div>
+    </div>
+    <button class="user-settings-btn" id="settingsBtn">⚙ Settings</button>
+  </div>
+
+  <!-- Config: Tech / Date / Shift / Subject -->
   <div class="config-bar">
+    <div class="config-field">
+      <label>Technician</label>
+      <input type="text" id="pdTech" placeholder="Name" readonly style="cursor:default; opacity:0.7;">
+    </div>
     <div class="config-field">
       <label>Date</label>
       <input type="date" id="pdDate">
@@ -564,30 +713,7 @@
     </div>
   </div>
 
-  <!-- GitHub Token -->
-  <div class="token-bar">
-    <div class="config-field">
-      <label>GitHub Personal Access Token</label>
-      <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-    </div>
-    <div class="token-status">
-      <div class="status-dot" id="keyStatus"></div>
-      <span class="status-text" id="keyStatusText">No token</span>
-    </div>
-    <button class="token-help-toggle" id="helpToggle">Setup Guide</button>
-  </div>
-
-  <div class="token-help" id="tokenHelp">
-    <strong>How to get your free GitHub token (2 minutes):</strong><br>
-    1. Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank">github.com/settings/tokens</a> and click <strong>"Generate new token"</strong><br>
-    2. Give it a name like "Pass Down Agent"<br>
-    3. Under <strong>Permissions</strong>, enable <strong>Models → Read</strong> (this is all it needs)<br>
-    4. Click <strong>Generate token</strong> and paste it above<br>
-    5. Your token stays in your browser only — it is never stored or sent anywhere except GitHub's API<br><br>
-    <strong>Free tier limits:</strong> ~150 requests/day — more than enough for shift pass-downs.
-  </div>
-
-  <!-- Model Selector + Recipients -->
+  <!-- Model + Recipients -->
   <div class="model-bar">
     <div class="config-field">
       <label>AI Model</label>
@@ -600,7 +726,7 @@
       </select>
     </div>
     <div class="config-field">
-      <label>Recipients (comma-separated)</label>
+      <label>Recipients</label>
       <input type="text" id="recipients" placeholder="team@keysight.com, lead@keysight.com">
     </div>
   </div>
@@ -618,11 +744,6 @@
       <div class="panel-body">
         <textarea id="rawNotes" placeholder="Type or dictate your shift notes — one thought per line works best.&#10;&#10;Example:&#10;fieldfox 234 came back from customer broken connector, on bench 3 for eval&#10;unit 891 cal finished looks good ready to ship&#10;safety reminder hard hats in bay 4&#10;need to follow up with dave on firmware issue&#10;new guy marcos starting tomorrow on swing shift"></textarea>
       </div>
-      <div class="section-hint">
-        <span class="hint-label">Modes:</span>
-        <span class="tag ai">AI Format</span>
-        <span class="tag floor">Quick Format</span>
-      </div>
     </div>
 
     <div class="panel">
@@ -636,7 +757,7 @@
     </div>
   </div>
 
-  <!-- Action Buttons -->
+  <!-- Actions -->
   <div class="actions">
     <button class="btn btn-primary" id="aiCleanBtn">
       <span id="aiCleanBtnText">⚡ AI Format</span>
@@ -661,12 +782,10 @@
   // ── Elements ──
   const rawNotes      = document.getElementById('rawNotes');
   const preview       = document.getElementById('preview');
+  const pdTech        = document.getElementById('pdTech');
   const pdDate        = document.getElementById('pdDate');
   const pdShift       = document.getElementById('pdShift');
   const pdSubject     = document.getElementById('pdSubject');
-  const ghToken       = document.getElementById('ghToken');
-  const keyStatus     = document.getElementById('keyStatus');
-  const keyStatusText = document.getElementById('keyStatusText');
   const aiModel       = document.getElementById('aiModel');
   const recipients    = document.getElementById('recipients');
   const aiCleanBtn    = document.getElementById('aiCleanBtn');
@@ -677,74 +796,201 @@
   const clearBtn      = document.getElementById('clearBtn');
   const micBtn        = document.getElementById('micBtn');
   const statusMsg     = document.getElementById('statusMsg');
-  const helpToggle    = document.getElementById('helpToggle');
-  const tokenHelp     = document.getElementById('tokenHelp');
+
+  // Setup overlay
+  const setupOverlay  = document.getElementById('setupOverlay');
+  const setupName     = document.getElementById('setupName');
+  const setupToken    = document.getElementById('setupToken');
+  const setupRecip    = document.getElementById('setupRecipients');
+  const setupNote     = document.getElementById('setupNote');
+  const setupTestBtn  = document.getElementById('setupTestBtn');
+  const setupDoneBtn  = document.getElementById('setupDoneBtn');
+
+  // User badge
+  const userBadge     = document.getElementById('userBadge');
+  const userAvatar    = document.getElementById('userAvatar');
+  const userName      = document.getElementById('userName');
+  const settingsBtn   = document.getElementById('settingsBtn');
 
   let isRecording = false;
   let recognition = null;
+  let tokenVerified = false;
 
-  // ── Set today ──
   const today = new Date();
   pdDate.value = today.toISOString().split('T')[0];
 
-  // ── Persist settings in localStorage (token, recipients, model) ──
-  function loadSettings() {
-    const saved = JSON.parse(localStorage.getItem('pd_settings') || '{}');
-    if (saved.token) { ghToken.value = saved.token; updateTokenStatus(); }
-    if (saved.recipients) recipients.value = saved.recipients;
-    if (saved.model) aiModel.value = saved.model;
-    if (saved.subject) pdSubject.value = saved.subject;
+  // ══════════════════════════════════════
+  //  SETTINGS PERSISTENCE
+  // ══════════════════════════════════════
+
+  function getSettings() {
+    return JSON.parse(localStorage.getItem('pd_settings') || '{}');
   }
 
-  function saveSettings() {
-    localStorage.setItem('pd_settings', JSON.stringify({
-      token: ghToken.value.trim(),
-      recipients: recipients.value.trim(),
-      model: aiModel.value,
-      subject: pdSubject.value.trim(),
-    }));
+  function saveSettings(updates) {
+    const current = getSettings();
+    const merged = { ...current, ...updates };
+    localStorage.setItem('pd_settings', JSON.stringify(merged));
+    return merged;
   }
 
-  // Save on change
-  [ghToken, recipients, aiModel, pdSubject].forEach(el => {
-    el.addEventListener('change', saveSettings);
-    el.addEventListener('input', saveSettings);
+  function applySettings() {
+    const s = getSettings();
+    if (s.name) {
+      pdTech.value = s.name;
+      userName.textContent = s.name;
+      userAvatar.textContent = s.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    }
+    if (s.recipients) recipients.value = s.recipients;
+    if (s.model) aiModel.value = s.model;
+    if (s.subject) pdSubject.value = s.subject;
+  }
+
+  function autoSaveFields() {
+    [recipients, aiModel, pdSubject].forEach(el => {
+      el.addEventListener('change', () => {
+        saveSettings({
+          recipients: recipients.value.trim(),
+          model: aiModel.value,
+          subject: pdSubject.value.trim(),
+        });
+      });
+    });
+  }
+
+  // ══════════════════════════════════════
+  //  SETUP FLOW
+  // ══════════════════════════════════════
+
+  function checkFirstRun() {
+    const s = getSettings();
+    if (s.token && s.name) {
+      setupOverlay.classList.add('hidden');
+      applySettings();
+    } else {
+      setupOverlay.classList.remove('hidden');
+      if (s.name) setupName.value = s.name;
+      if (s.recipients) setupRecip.value = s.recipients;
+    }
+  }
+
+  // Test token button
+  setupTestBtn.addEventListener('click', async () => {
+    const token = setupToken.value.trim();
+    const name = setupName.value.trim();
+
+    if (!name) {
+      setupNote.textContent = 'Enter your name above.';
+      setupNote.className = 'setup-note error';
+      return;
+    }
+
+    if (!token) {
+      setupNote.textContent = 'Paste your GitHub token above.';
+      setupNote.className = 'setup-note error';
+      return;
+    }
+
+    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+      setupNote.textContent = 'Token should start with ghp_ or github_pat_ — double check you copied it correctly.';
+      setupNote.className = 'setup-note error';
+      return;
+    }
+
+    setupTestBtn.disabled = true;
+    setupTestBtn.innerHTML = '<span class="spinner"></span> Testing...';
+    setupNote.textContent = 'Connecting to GitHub Models...';
+    setupNote.className = 'setup-note info';
+
+    try {
+      const res = await fetch('https://models.github.ai/inference/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-4o-mini',
+          messages: [{ role: 'user', content: 'Reply with exactly: TOKEN_VALID' }],
+          max_tokens: 20,
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        if (res.status === 401) throw new Error('Token was rejected. Check that it has Models:Read permission.');
+        if (res.status === 403) throw new Error('Access denied. Make sure you enabled Models:Read when creating the token.');
+        throw new Error(err.message || `GitHub returned error ${res.status}`);
+      }
+
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || '';
+
+      if (reply.includes('TOKEN_VALID')) {
+        tokenVerified = true;
+        setupNote.textContent = `Token verified! Connected to GitHub Models as ${name}. Click "Save & Start" to continue.`;
+        setupNote.className = 'setup-note success';
+        setupDoneBtn.disabled = false;
+      } else {
+        tokenVerified = true;
+        setupNote.textContent = `Got a response from GitHub Models — token works! Click "Save & Start" to continue.`;
+        setupNote.className = 'setup-note success';
+        setupDoneBtn.disabled = false;
+      }
+
+    } catch (err) {
+      setupNote.textContent = 'Error: ' + err.message;
+      setupNote.className = 'setup-note error';
+      tokenVerified = false;
+      setupDoneBtn.disabled = true;
+    } finally {
+      setupTestBtn.disabled = false;
+      setupTestBtn.innerHTML = '🔍 Test Token';
+    }
   });
 
-  loadSettings();
+  // Save & Start
+  setupDoneBtn.addEventListener('click', () => {
+    if (!tokenVerified) return;
 
-  // ── Token status ──
-  function updateTokenStatus() {
-    const val = ghToken.value.trim();
-    const valid = val.length > 10 && (val.startsWith('ghp_') || val.startsWith('github_pat_'));
-    keyStatus.classList.toggle('active', valid);
-    keyStatusText.textContent = valid ? 'Token set' : 'No token';
-    keyStatusText.classList.toggle('active', valid);
-  }
+    saveSettings({
+      name: setupName.value.trim(),
+      token: setupToken.value.trim(),
+      recipients: setupRecip.value.trim(),
+    });
 
-  ghToken.addEventListener('input', updateTokenStatus);
-
-  // ── Help toggle ──
-  helpToggle.addEventListener('click', () => {
-    const open = tokenHelp.style.display === 'block';
-    tokenHelp.style.display = open ? 'none' : 'block';
-    helpToggle.textContent = open ? 'Setup Guide' : 'Hide Guide';
+    setupOverlay.classList.add('hidden');
+    applySettings();
   });
 
-  // ══════════════════════════════════════════════
+  // Settings button — reopen setup
+  settingsBtn.addEventListener('click', () => {
+    const s = getSettings();
+    setupName.value = s.name || '';
+    setupToken.value = '';  // never pre-fill token for security
+    setupRecip.value = s.recipients || '';
+    setupNote.className = 'setup-note';
+    setupNote.textContent = '';
+    tokenVerified = false;
+    setupDoneBtn.disabled = true;
+    setupOverlay.classList.remove('hidden');
+  });
+
+  // ══════════════════════════════════════
   //  AI FORMAT — GitHub Models API
-  // ══════════════════════════════════════════════
+  // ══════════════════════════════════════
 
   aiCleanBtn.addEventListener('click', async () => {
     const notes = rawNotes.value.trim();
-    const token = ghToken.value.trim();
+    const s = getSettings();
 
     if (!notes) { showStatus('Enter some notes first.', 'error'); return; }
-    if (!token) { showStatus('Enter your GitHub token above. Click "Setup Guide" for instructions.', 'error'); return; }
+    if (!s.token) { showStatus('No token configured. Click ⚙ Settings to set up.', 'error'); return; }
 
-    const date = pdDate.value || today.toISOString().split('T')[0];
-    const shift = pdShift.value;
-    const model = aiModel.value;
+    const date   = pdDate.value || today.toISOString().split('T')[0];
+    const shift  = pdShift.value;
+    const tech   = s.name || 'Unknown';
+    const model  = aiModel.value;
 
     aiCleanBtn.disabled = true;
     aiCleanBtnText.innerHTML = '<span class="spinner"></span> Formatting...';
@@ -756,6 +1002,7 @@ Output this EXACT format (plain text, no markdown):
 
 TECH PASS DOWN — ${formatDate(date)}
 Shift: ${shift}
+Technician: ${tech}
 ${'━'.repeat(42)}
 
 ON THE FLOOR
@@ -780,7 +1027,7 @@ Rules:
 - Clean up grammar, spelling, and sentence structure. Keep tone professional and concise.
 - Properly capitalize known acronyms: FieldFox, SCPI, ESD, PPE, RMA, NPI, RF, PCB, DUT, SMA, BNC, USB, WO.
 - If a section has no relevant notes, write "  No items." under it.
-- Use PLAIN TEXT only. No markdown, no asterisks, no bold markers. Just clean numbered items with dashes.
+- Use PLAIN TEXT only. No markdown, no asterisks, no bold markers. Just clean numbered items.
 - Keep it tight and scannable — this gets read quickly at shift change.
 - Do NOT include any preamble, commentary, or explanation. Output ONLY the formatted pass-down.`;
 
@@ -789,7 +1036,7 @@ Rules:
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${s.token}`,
         },
         body: JSON.stringify({
           model: model,
@@ -804,18 +1051,13 @@ Rules:
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        const errMsg = errData.error?.message || errData.message || `HTTP ${response.status}`;
-        if (response.status === 401) {
-          throw new Error('Invalid token. Check your GitHub PAT and make sure it has Models:Read permission.');
-        } else if (response.status === 429) {
-          throw new Error('Rate limit reached. Try again in a minute, or use Quick Format.');
-        }
-        throw new Error(errMsg);
+        if (response.status === 401) throw new Error('Token expired or invalid. Click ⚙ Settings to update.');
+        if (response.status === 429) throw new Error('Rate limit reached. Wait a minute or use Quick Format.');
+        throw new Error(errData.message || errData.error?.message || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
       const output = data.choices?.[0]?.message?.content || '';
-
       if (!output) throw new Error('Empty response from model.');
 
       preview.value = output;
@@ -832,9 +1074,9 @@ Rules:
     }
   });
 
-  // ══════════════════════════════════════════════════════
-  //  QUICK FORMAT — local keyword-based fallback
-  // ══════════════════════════════════════════════════════
+  // ══════════════════════════════════════
+  //  QUICK FORMAT — local keyword fallback
+  // ══════════════════════════════════════
 
   const sectionRules = {
     floor: [
@@ -926,9 +1168,10 @@ Rules:
       if (sec) buckets[sec].push(cleanLine(line));
     }
 
-    const date = pdDate.value || today.toISOString().split('T')[0];
+    const date  = pdDate.value || today.toISOString().split('T')[0];
     const shift = pdShift.value;
-    const div = '━'.repeat(42);
+    const tech  = getSettings().name || 'Unknown';
+    const div   = '━'.repeat(42);
 
     const block = (title, items) => {
       const body = items.length > 0
@@ -940,6 +1183,7 @@ Rules:
     const output = [
       `TECH PASS DOWN — ${formatDate(date)}`,
       `Shift: ${shift}`,
+      `Technician: ${tech}`,
       div, '',
       block('ON THE FLOOR', buckets.floor), '',
       block('UNITS IN CAL', buckets.cal), '',
@@ -1001,7 +1245,7 @@ Rules:
     micBtn.style.display = 'none';
   }
 
-  // ── Send via mailto ──
+  // ── Send ──
   sendBtn.addEventListener('click', () => {
     const body = preview.value.trim();
     if (!body) return;
@@ -1031,7 +1275,6 @@ Rules:
     hideStatus();
   });
 
-  // ── Enable buttons if user edits preview directly ──
   preview.addEventListener('input', () => {
     const has = preview.value.trim().length > 0;
     sendBtn.disabled = !has;
@@ -1050,6 +1293,10 @@ Rules:
   }
 
   function hideStatus() { statusMsg.className = 'status-msg'; }
+
+  // ── Init ──
+  autoSaveFields();
+  checkFirstRun();
 
 })();
 </script>
