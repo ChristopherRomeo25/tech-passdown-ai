@@ -1,316 +1,778 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tech Pass Down AI</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Pass Down — AI Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      margin: 0;
-      background: #0f172a;
-      color: #e2e8f0;
-      padding: 30px;
-    }
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-secondary: #111827;
+    --bg-card: #151d2e;
+    --bg-input: #0d1321;
+    --border: #1e2a42;
+    --border-focus: #e97a1f;
+    --accent: #e97a1f;
+    --accent-glow: rgba(233, 122, 31, 0.15);
+    --text-primary: #e8edf5;
+    --text-secondary: #8899b4;
+    --text-muted: #4a5a78;
+    --success: #22c55e;
+    --success-bg: rgba(34, 197, 94, 0.1);
+    --danger: #ef4444;
+    --danger-bg: rgba(239, 68, 68, 0.08);
+    --mic-active: #ef4444;
+    --font-display: 'JetBrains Mono', monospace;
+    --font-body: 'IBM Plex Sans', sans-serif;
+  }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
 
-    h1 {
-      margin-bottom: 8px;
-      font-size: 32px;
-    }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(233,122,31,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(233,122,31,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .subtitle {
-      margin-top: 0;
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
+  .app-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
 
-    .card {
-      background: #1e293b;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      margin-bottom: 20px;
-    }
+  .app-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
 
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--accent), #c45e0a);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-    }
+  .header-text h1 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
 
-    label {
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #cbd5e1;
-    }
+  .header-text p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
 
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #0f172a;
-      color: #e2e8f0;
-      font-size: 15px;
-    }
+  .config-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
 
-    textarea {
-      min-height: 220px;
-      resize: vertical;
-    }
+  @media (max-width: 700px) {
+    .config-bar { grid-template-columns: 1fr; }
+    .panels { grid-template-columns: 1fr !important; }
+  }
 
-    .button-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
+  .config-field label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
 
-    button {
-      border: none;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+  .config-field input,
+  .config-field select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
 
-    .primary {
-      background: #22c55e;
-      color: white;
-    }
+  .config-field input:focus,
+  .config-field select:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
 
-    .secondary {
-      background: #3b82f6;
-      color: white;
-    }
+  .config-field select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
 
-    .ghost {
-      background: #475569;
-      color: white;
-    }
+  .recipients-bar {
+    margin-bottom: 24px;
+  }
 
-    .preview {
-      white-space: pre-wrap;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 16px;
-      min-height: 250px;
-      line-height: 1.6;
-    }
+  .recipients-bar label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
 
-    .small-note {
-      color: #94a3b8;
-      font-size: 14px;
-      margin-top: 8px;
-    }
+  .recipients-bar input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
 
-    @media (max-width: 800px) {
-      .row {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  .recipients-bar input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary);
+  }
+
+  .panel-title {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+  }
+
+  textarea {
+    width: 100%;
+    height: 360px;
+    padding: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.7;
+    resize: vertical;
+  }
+
+  textarea:focus { outline: none; }
+  textarea::placeholder { color: var(--text-muted); font-style: italic; }
+
+  .preview-textarea {
+    width: 100%;
+    height: 360px;
+    padding: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 1.7;
+    resize: vertical;
+  }
+
+  .preview-textarea:focus { outline: none; }
+  .preview-textarea::placeholder { color: var(--text-muted); font-style: italic; font-family: var(--font-body); }
+
+  .mic-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mic-btn:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+
+  .mic-btn.recording {
+    border-color: var(--mic-active);
+    color: var(--mic-active);
+    animation: pulse-mic 1.2s infinite;
+  }
+
+  .mic-btn .mic-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  @keyframes pulse-mic {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  }
+
+  .section-hint {
+    padding: 6px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .section-hint .hint-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .tag.floor { background: rgba(59,130,246,0.08); color: #60a5fa; border: 1px solid rgba(59,130,246,0.15); }
+  .tag.cal { background: rgba(168,85,247,0.08); color: #c084fc; border: 1px solid rgba(168,85,247,0.15); }
+  .tag.safety { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.15); }
+  .tag.action { background: rgba(234,179,8,0.08); color: #facc15; border: 1px solid rgba(234,179,8,0.15); }
+  .tag.info { background: rgba(34,197,94,0.08); color: #4ade80; border: 1px solid rgba(34,197,94,0.15); }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #c45e0a);
+    color: #fff;
+    box-shadow: 0 2px 12px var(--accent-glow);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(233,122,31,0.3);
+  }
+
+  .btn-secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--text-muted);
+    background: var(--bg-secondary);
+  }
+
+  .btn-send {
+    background: linear-gradient(135deg, var(--success), #16a34a);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(34,197,94,0.15);
+  }
+
+  .btn-send:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(34,197,94,0.25);
+  }
+
+  .status-msg {
+    margin-top: 16px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: var(--font-display);
+    display: none;
+  }
+
+  .status-msg.info { display: block; background: var(--accent-glow); border: 1px solid rgba(233,122,31,0.25); color: var(--accent); }
+  .status-msg.success { display: block; background: var(--success-bg); border: 1px solid rgba(34,197,94,0.25); color: var(--success); }
+  .status-msg.error { display: block; background: var(--danger-bg); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .app-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    letter-spacing: 0.5px;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Tech Pass Down AI</h1>
-    <p class="subtitle">Simple pass-down formatter for technicians</p>
 
-    <div class="card">
-      <div class="row">
-        <div class="field">
-          <label for="date">Date</label>
-          <input type="date" id="date" />
-        </div>
+<div class="app-wrapper">
 
-        <div class="field">
-          <label for="shift">Shift</label>
-          <select id="shift">
-            <option value="AM">AM</option>
-            <option value="PM">PM</option>
-            <option value="NOC">NOC</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="notes">Raw Notes</label>
-        <textarea id="notes" placeholder="Example:
-N9917B 106 running
-N9918B 105 in chamber
-Quality issue on unit 53 needs recheck tomorrow
-Sebas follow up on failed test"></textarea>
-      </div>
-
-      <div class="button-row">
-        <button class="primary" onclick="formatPassdown()">Format Passdown</button>
-        <button class="secondary" onclick="openEmailDraft()">Open Email Draft</button>
-        <button class="ghost" onclick="clearAllFields()">Clear</button>
-      </div>
-
-      <div class="small-note">
-        This version auto-sorts lines into On The Floor, Safety / Quality, and Action Items.
-      </div>
+  <header class="app-header">
+    <div class="logo-mark">PD</div>
+    <div class="header-text">
+      <h1>Tech Pass Down Agent</h1>
+      <p>Speak it, clean it, send it — runs entirely in your browser</p>
     </div>
+  </header>
 
-    <div class="card">
-      <label>Preview</label>
-      <div id="preview" class="preview">Your formatted pass-down will appear here.</div>
+  <div class="config-bar">
+    <div class="config-field">
+      <label>Date</label>
+      <input type="date" id="pdDate">
+    </div>
+    <div class="config-field">
+      <label>Shift</label>
+      <select id="pdShift">
+        <option value="Day Shift">Day Shift</option>
+        <option value="Swing Shift">Swing Shift</option>
+        <option value="Night Shift">Night Shift</option>
+      </select>
+    </div>
+    <div class="config-field">
+      <label>Email Subject</label>
+      <input type="text" id="pdSubject" placeholder="Tech Pass Down — {{date}}">
     </div>
   </div>
 
-  <script>
-    const recipientList = "your@email.com";
+  <div class="recipients-bar">
+    <label>Recipients (comma-separated)</label>
+    <input type="text" id="recipients" placeholder="team@keysight.com, lead@keysight.com">
+  </div>
 
-    window.onload = function () {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, "0");
-      const day = String(today.getDate()).padStart(2, "0");
-      document.getElementById("date").value = `${year}-${month}-${day}`;
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Raw Notes</span>
+        <button class="mic-btn" id="micBtn" title="Click to dictate">
+          <span>🎙</span>
+          <span class="mic-label">Mic</span>
+        </button>
+      </div>
+      <div class="panel-body">
+        <textarea id="rawNotes" placeholder="Type or dictate your shift notes — one thought per line works best.&#10;&#10;Example:&#10;fieldfox 234 came back from customer broken connector, on bench 3 for eval&#10;unit 891 cal finished looks good ready to ship&#10;safety reminder hard hats in bay 4&#10;need to follow up with dave on firmware issue&#10;new guy marcos starting tomorrow on swing shift"></textarea>
+      </div>
+      <div class="section-hint">
+        <span class="hint-label">Auto-sorts:</span>
+        <span class="tag floor">floor</span>
+        <span class="tag cal">cal</span>
+        <span class="tag safety">safety</span>
+        <span class="tag action">action</span>
+        <span class="tag info">info</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Cleaned Pass Down</span>
+        <span style="font-family:var(--font-display);font-size:10px;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase;">Editable</span>
+      </div>
+      <div class="panel-body">
+        <textarea class="preview-textarea" id="preview" placeholder="Your formatted pass down appears here after clicking 'Format Pass Down.'&#10;&#10;The output is fully editable — move items between sections, reword anything, then send."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="cleanBtn">⚡ Format Pass Down</button>
+    <button class="btn btn-send" id="sendBtn" disabled>✉ Send Pass Down</button>
+    <button class="btn btn-secondary" id="copyBtn" disabled>📋 Copy</button>
+    <button class="btn btn-secondary" id="clearBtn">✕ Clear</button>
+  </div>
+
+  <div class="status-msg" id="statusMsg"></div>
+
+  <div class="app-footer">
+    Tech Pass Down Agent v1.0 — Built by Chris Martinez — C&C Tech Support
+  </div>
+
+</div>
+
+<script>
+(function() {
+
+  const rawNotes   = document.getElementById('rawNotes');
+  const preview    = document.getElementById('preview');
+  const pdDate     = document.getElementById('pdDate');
+  const pdShift    = document.getElementById('pdShift');
+  const pdSubject  = document.getElementById('pdSubject');
+  const recipients = document.getElementById('recipients');
+  const cleanBtn   = document.getElementById('cleanBtn');
+  const sendBtn    = document.getElementById('sendBtn');
+  const copyBtn    = document.getElementById('copyBtn');
+  const clearBtn   = document.getElementById('clearBtn');
+  const micBtn     = document.getElementById('micBtn');
+  const statusMsg  = document.getElementById('statusMsg');
+
+  let isRecording = false;
+  let recognition = null;
+
+  const today = new Date();
+  pdDate.value = today.toISOString().split('T')[0];
+
+  // ══════════════════════════════════════════════════════════════
+  //  SMART FORMATTER — keyword routing + grammar/acronym cleanup
+  // ══════════════════════════════════════════════════════════════
+
+  const sectionRules = {
+    floor: [
+      /\bbench\b/i, /\bon the floor\b/i, /\bfloor\b/i,
+      /\bunit\b.*\b(eval|repair|rework|troubleshoot|diagnos|broke|broken|fail|issue|rma|return|swap|replace)/i,
+      /\b(eval|repair|rework|troubleshoot|diagnos)\b/i,
+      /\b(fieldfox|FF\s*\d|N99\d\d|spec\s*an|signal\s*gen|scope|meter|analyzer|network\s*anal)/i,
+      /\bserial\s*(number|#|no)/i,
+      /\b(connector|port|display|screen|keypad|button|battery|fan|board)\b.*\b(broke|broken|damage|fail|issue|crack|replace)/i,
+      /\bcustomer\s*(return|sent|ship)/i,
+      /\brma\b/i, /\bwork\s*order\b/i, /\bwo\s*\d/i,
+    ],
+    cal: [
+      /\bcal\s/i, /\bcal$/i, /\bcal\./i, /\bcalibrat/i,
+      /\b(due\s*date|cal\s*date|next\s*cal)\b/i,
+      /\b(adjusted|adjustment|alignment|verified|verification)\b/i,
+      /\bstandard/i, /\btraceable\b/i, /\buncertainty\b/i,
+      /\bspec\b.*\b(pass|fail|met|out)\b/i,
+    ],
+    safety: [
+      /\bsafety\b/i, /\bquality\b/i, /\bhard\s*hat/i,
+      /\bppe\b/i, /\bgloves\b/i, /\bgoggles\b/i,
+      /\bhazard/i, /\besd\b/i, /\bslip\b/i, /\bspill\b/i,
+      /\blockout/i, /\btag\s*out/i, /\bfire\b/i,
+      /\beveracuat/i, /\binjur/i, /\bincident\b/i,
+      /\baudit\b/i, /\bcompliance\b/i, /\bhold\b/i,
+      /\bquarantine\b/i, /\bncr\b/i, /\bcapa\b/i, /\bdeviat/i,
+    ],
+    action: [
+      /\bneed\s*to\b/i, /\bfollow\s*up\b/i, /\bpending\b/i,
+      /\btomorrow\b/i, /\bnext\s*shift\b/i,
+      /\breminder\b.*\b(to|for|about)\b/i,
+      /\bdon'?t\s*forget\b/i, /\bmake\s*sure\b/i,
+      /\bwaiting\s*(on|for)\b/i, /\bordered\b/i,
+      /\border\s*(placed|pending|coming|arriving)/i,
+      /\bescalat/i, /\bcontact\b/i,
+      /\bcall\b.*\b(back|about|regarding)\b/i,
+      /\bemail\b.*\b(about|regarding|to)\b/i,
+      /\bsubmit\b/i, /\bopen\s*(ticket|case|request)\b/i,
+      /\btodo\b/i, /\baction\s*item/i,
+    ],
+  };
+
+  function classifyLine(line) {
+    const t = line.trim();
+    if (!t) return null;
+    for (const [section, patterns] of Object.entries(sectionRules)) {
+      for (const p of patterns) {
+        if (p.test(t)) return section;
+      }
+    }
+    return 'info';
+  }
+
+  // Acronym / proper-noun map (lowercase → replacement)
+  const wordMap = {
+    'fieldfox': 'FieldFox', 'keysight': 'Keysight',
+    'scpi': 'SCPI', 'esd': 'ESD', 'ppe': 'PPE',
+    'rma': 'RMA', 'npi': 'NPI', 'rf': 'RF', 'pcb': 'PCB',
+    'dut': 'DUT', 'sma': 'SMA', 'bnc': 'BNC', 'usb': 'USB',
+    'lan': 'LAN', 'gps': 'GPS', 'ios': 'iOS', 'sql': 'SQL',
+  };
+
+  // Contraction fixes (lowercase → replacement)
+  const contractions = {
+    'im': "I'm", 'dont': "don't", 'cant': "can't", 'wont': "won't",
+    'didnt': "didn't", 'isnt': "isn't", 'wasnt': "wasn't",
+    'couldnt': "couldn't", 'wouldnt': "wouldn't", 'shouldnt': "shouldn't",
+    'thats': "that's", 'whats': "what's", 'hes': "he's",
+    'shes': "she's", 'theyre': "they're", 'weve': "we've",
+    'youre': "you're", 'ive': "I've", 'itll': "it'll",
+    'doesnt': "doesn't", 'hasnt': "hasn't", 'hadnt': "hadn't",
+    'whos': "who's", 'theres': "there's", 'lets': "let's",
+  };
+
+  function cleanLine(line) {
+    let s = line.trim();
+    if (!s) return '';
+
+    // Fix contractions (word-boundary match)
+    for (const [raw, fixed] of Object.entries(contractions)) {
+      s = s.replace(new RegExp('\\b' + raw + '\\b', 'gi'), fixed);
+    }
+
+    // Fix acronyms / proper nouns
+    for (const [raw, fixed] of Object.entries(wordMap)) {
+      s = s.replace(new RegExp('\\b' + raw + '\\b', 'gi'), fixed);
+    }
+
+    // Standalone "i" → "I"
+    s = s.replace(/\bi\b/g, 'I');
+
+    // WO followed by number
+    s = s.replace(/\bwo\s*(\d)/gi, 'WO $1');
+
+    // Capitalize first letter of line
+    s = s.charAt(0).toUpperCase() + s.slice(1);
+
+    // Add period if no end punctuation
+    if (!/[.!?:;]$/.test(s)) s += '.';
+
+    // Clean double spaces
+    s = s.replace(/\s{2,}/g, ' ');
+
+    return s;
+  }
+
+  function formatPassDown() {
+    const raw = rawNotes.value.trim();
+    if (!raw) { showStatus('Enter some notes first.', 'error'); return; }
+
+    // Split into lines. If notes are a big blob, also split on sentence-end boundaries.
+    let lines = raw.split(/\n/).map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length <= 2 && raw.length > 200) {
+      lines = raw.split(/(?<=[.!?])\s+/).map(l => l.trim()).filter(l => l.length > 0);
+    }
+
+    const buckets = { floor: [], cal: [], safety: [], action: [], info: [] };
+    for (const line of lines) {
+      const section = classifyLine(line);
+      if (section) buckets[section].push(cleanLine(line));
+    }
+
+    const date    = pdDate.value || today.toISOString().split('T')[0];
+    const shift   = pdShift.value;
+    const divider = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+
+    const block = (title, items) => {
+      const body = items.length > 0
+        ? items.map((item, i) => `  ${i + 1}. ${item}`).join('\n')
+        : '  No items.';
+      return `${title}\n${body}`;
     };
 
-    function formatDisplayDate(dateValue) {
-      if (!dateValue) return "No Date";
-      const parts = dateValue.split("-");
-      const year = Number(parts[0]);
-      const month = Number(parts[1]) - 1;
-      const day = Number(parts[2]);
+    const output = [
+      `TECH PASS DOWN — ${formatDate(date)}`,
+      `Shift: ${shift}`,
+      divider, '',
+      block('ON THE FLOOR', buckets.floor), '',
+      block('UNITS IN CAL', buckets.cal), '',
+      block('SAFETY / QUALITY', buckets.safety), '',
+      block('ACTION ITEMS', buckets.action), '',
+      block('ADDITIONAL INFORMATION', buckets.info), '',
+      divider,
+    ].join('\n');
 
-      const date = new Date(year, month, day);
+    preview.value = output;
+    sendBtn.disabled = false;
+    copyBtn.disabled = false;
 
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      });
-    }
+    const total = Object.values(buckets).reduce((s, b) => s + b.length, 0);
+    const filled = Object.values(buckets).filter(b => b.length > 0).length;
+    showStatus(`Formatted ${total} item${total !== 1 ? 's' : ''} across ${filled} section${filled !== 1 ? 's' : ''}.`, 'success');
+  }
 
-    function formatPassdown() {
-      const dateValue = document.getElementById("date").value;
-      const shift = document.getElementById("shift").value;
-      const notes = document.getElementById("notes").value.trim();
+  // ── Web Speech API ──
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
 
-      const displayDate = formatDisplayDate(dateValue);
+    let finalTranscript = '';
 
-      const onTheFloor = [];
-      const safetyQuality = [];
-      const actionItems = [];
-
-      if (notes.length > 0) {
-        const lines = notes
-          .split("\n")
-          .map(function (line) {
-            return line.trim();
-          })
-          .filter(function (line) {
-            return line !== "";
-          });
-
-        lines.forEach(function (line) {
-          const lowerLine = line.toLowerCase();
-
-          const isSafetyQuality =
-            lowerLine.includes("quality") ||
-            lowerLine.includes("safety") ||
-            lowerLine.includes("issue") ||
-            lowerLine.includes("fail") ||
-            lowerLine.includes("failed") ||
-            lowerLine.includes("recheck") ||
-            lowerLine.includes("hold") ||
-            lowerLine.includes("problem") ||
-            lowerLine.includes("error");
-
-          const isActionItem =
-            lowerLine.includes("follow up") ||
-            lowerLine.includes("follow-up") ||
-            lowerLine.includes("tomorrow") ||
-            lowerLine.includes("needs") ||
-            lowerLine.includes("need to") ||
-            lowerLine.includes("review") ||
-            lowerLine.includes("verify") ||
-            lowerLine.includes("retest") ||
-            lowerLine.includes("inspect") ||
-            lowerLine.includes("sebas") ||
-            lowerLine.includes("kalani");
-
-          if (isSafetyQuality) {
-            safetyQuality.push("• " + line);
-          } else if (isActionItem) {
-            actionItems.push("• " + line);
-          } else {
-            onTheFloor.push("• " + line);
-          }
-        });
+    recognition.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          finalTranscript += e.results[i][0].transcript + '\n';
+        } else {
+          interim += e.results[i][0].transcript;
+        }
       }
+      rawNotes.value = finalTranscript + interim;
+    };
 
-      const onTheFloorText =
-        onTheFloor.length > 0 ? onTheFloor.join("\n") : "• No updates entered.";
+    recognition.onerror = (e) => {
+      stopRecording();
+      showStatus('Mic error: ' + e.error, 'error');
+    };
 
-      const safetyQualityText =
-        safetyQuality.length > 0 ? safetyQuality.join("\n") : "• None.";
+    recognition.onend = () => { if (isRecording) recognition.start(); };
 
-      const actionItemsText =
-        actionItems.length > 0 ? actionItems.join("\n") : "• None.";
+    micBtn.addEventListener('click', () => {
+      isRecording ? stopRecording() : startRecording();
+    });
 
-      const passdownText =
-`Tech Pass Down – ${displayDate} ${shift}
-
-On The Floor
-${onTheFloorText}
-
-Safety / Quality
-${safetyQualityText}
-
-Action Items
-${actionItemsText}`;
-
-      document.getElementById("preview").textContent = passdownText;
+    function startRecording() {
+      finalTranscript = rawNotes.value;
+      if (finalTranscript && !finalTranscript.endsWith('\n')) finalTranscript += '\n';
+      isRecording = true;
+      micBtn.classList.add('recording');
+      micBtn.querySelector('.mic-label').textContent = 'Stop';
+      recognition.start();
+      showStatus('Listening... pause between items for best results.', 'info');
     }
 
-    function openEmailDraft() {
-      const previewText = document.getElementById("preview").textContent.trim();
-
-      if (
-        previewText === "" ||
-        previewText === "Your formatted pass-down will appear here."
-      ) {
-        alert("Please click 'Format Passdown' first.");
-        return;
-      }
-
-      const dateValue = document.getElementById("date").value;
-      const shift = document.getElementById("shift").value;
-      const displayDate = formatDisplayDate(dateValue);
-      const subject = `Tech Pass Down – ${displayDate} ${shift}`;
-
-      const mailtoLink =
-        `mailto:${recipientList}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(previewText)}`;
-
-      window.location.href = mailtoLink;
+    function stopRecording() {
+      isRecording = false;
+      micBtn.classList.remove('recording');
+      micBtn.querySelector('.mic-label').textContent = 'Mic';
+      recognition.stop();
+      hideStatus();
     }
+  } else {
+    micBtn.style.display = 'none';
+  }
 
-    function clearAllFields() {
-      document.getElementById("notes").value = "";
-      document.getElementById("preview").textContent = "Your formatted pass-down will appear here.";
+  // ── Buttons ──
+  cleanBtn.addEventListener('click', formatPassDown);
+
+  sendBtn.addEventListener('click', () => {
+    const body = preview.value.trim();
+    if (!body) return;
+    const to = recipients.value.trim();
+    const date = pdDate.value || today.toISOString().split('T')[0];
+    const subjectTpl = pdSubject.value.trim() || 'Tech Pass Down — {{date}}';
+    const subject = subjectTpl.replace('{{date}}', formatDate(date));
+    window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    showStatus('Opening your mail client...', 'success');
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    const text = preview.value.trim();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus('Copied to clipboard.', 'success');
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showStatus('Copied to clipboard.', 'success');
     }
-  </script>
+  });
+
+  clearBtn.addEventListener('click', () => {
+    rawNotes.value = '';
+    preview.value = '';
+    sendBtn.disabled = true;
+    copyBtn.disabled = true;
+    hideStatus();
+  });
+
+  preview.addEventListener('input', () => {
+    const has = preview.value.trim().length > 0;
+    sendBtn.disabled = !has;
+    copyBtn.disabled = !has;
+  });
+
+  // ── Helpers ──
+  function formatDate(ds) {
+    const d = new Date(ds + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function showStatus(msg, type) {
+    statusMsg.textContent = msg;
+    statusMsg.className = 'status-msg ' + type;
+  }
+
+  function hideStatus() { statusMsg.className = 'status-msg'; }
+
+})();
+</script>
+
 </body>
 </html>
